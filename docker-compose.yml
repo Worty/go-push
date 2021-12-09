@@ -1,0 +1,16 @@
+services:
+  push:
+    image: ghcr.io/worty/go-push:latest
+    build:
+      context: .
+    environment:
+      - TZ=Europe/Berlin
+      - PUSHUSER=user
+      - PUSHPW=password
+      - HOST=https://push.worty.de
+      - FORWARDSITE=https://worty.de
+      - DATADIR=/data
+    volumes:
+      - ./data:/data
+    ports:
+      - "8080:8080"
