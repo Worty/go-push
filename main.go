@@ -62,8 +62,8 @@ func authreq() gin.HandlerFunc {
 
 func saveupload(c *gin.Context) {
 	c.Request.ParseMultipartForm(1024 * 1024 * 1024) // 1 GB
-	file, _ := c.FormFile("d")
-	if file.Filename == "" {
+	file, err := c.FormFile("d")
+	if file.Filename == "" || err != nil {
 		fmt.Println("no file")
 		forwardtomain(c)
 		return
@@ -75,9 +75,9 @@ func saveupload(c *gin.Context) {
 		return
 	}
 	filename := generateName(&hashstring, file.Filename)
-	error := c.SaveUploadedFile(file, datadir+"/"+filename)
-	if error != nil {
-		fmt.Println(error.Error())
+	err = c.SaveUploadedFile(file, datadir+"/"+filename)
+	if err != nil {
+		fmt.Println(err.Error())
 		forwardtomain(c)
 		return
 	}
