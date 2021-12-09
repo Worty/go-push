@@ -14,7 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var versioncommit string
 var username string
 var password string
 var forwardsite string
@@ -62,7 +61,7 @@ func authreq() gin.HandlerFunc {
 }
 
 func saveupload(c *gin.Context) {
-	c.Request.ParseMultipartForm(32 << 25) // 1 GB
+	c.Request.ParseMultipartForm(1024 * 1024 * 1024) // 1 GB
 	file, _ := c.FormFile("d")
 	if file.Filename == "" {
 		fmt.Println("no file")
@@ -99,9 +98,7 @@ func generateMD5(in *multipart.FileHeader) (string, error) {
 func main() {
 	parseEnv()
 	r := gin.New()
-	if versioncommit == "" {
-		r.Use(gin.Logger())
-	}
+	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(authreq())
 	r.POST("/", saveupload)

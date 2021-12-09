@@ -9,8 +9,7 @@ RUN go mod download
 
 ADD . /build
 WORKDIR /build
-ARG GIT_COMMIT
-RUN go build -ldflags "-linkmode external -s -w -extldflags -static -X main.versioncommit=$GIT_COMMIT" --trimpath -a -o ./main
+RUN go build -ldflags "-linkmode external -s -w -extldflags -static" --trimpath -a -o ./main
 
 FROM scratch
 WORKDIR /app/

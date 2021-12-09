@@ -3,6 +3,8 @@ services:
     image: ghcr.io/worty/go-push:latest
     build:
       context: .
+    tmpfs:
+      - /tmp
     environment:
       - TZ=Europe/Berlin
       - PUSHUSER=user
@@ -10,6 +12,8 @@ services:
       - HOST=https://push.worty.de
       - FORWARDSITE=https://worty.de
       - DATADIR=/data
+    #cpus: 0.5
+    mem_limit: 1G
     volumes:
       - ./data:/data
     ports:
