@@ -1,7 +1,6 @@
-#docker build -t ghcr.io/worty/go-push -f dockerfile.prod .
+#docker build -t ghcr.io/worty/go-push .
 FROM golang:1.17-alpine as go-build
-RUN apk add --no-cache gcc libc-dev 
-#RUN apk add --no-cache gcc libc-dev tzdata
+RUN apk add --no-cache gcc libc-dev tzdata
 ADD ./go.mod /build/go.mod
 ADD ./go.sum /build/go.sum
 WORKDIR /build
@@ -12,9 +11,9 @@ WORKDIR /build
 RUN go build -ldflags "-linkmode external -s -w -extldflags -static" --trimpath -a -o ./main
 
 FROM scratch
+COPY --from=go-build /usr/share/zoneinfo /usr/share/zoneinfo
 WORKDIR /app/
 COPY --from=go-build /build/main /app/
-#COPY --from=go-build /usr/share/zoneinfo /usr/share/zoneinfo
 ENV GIN_MODE=release
 EXPOSE 8080
 CMD ["./main"]
