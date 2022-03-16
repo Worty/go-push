@@ -127,7 +127,7 @@ func TestExtractfileending_tar_gz(t *testing.T) {
 }
 
 func TestExtractfileending_dotdottxt(t *testing.T) {
-	want := ".txta"
+	want := ".txt"
 	got := extractfileending("test..txt")
 	if got != want {
 		t.Error("extractfileending() failed: got", got, "want", want)
