@@ -8,6 +8,7 @@ RUN go mod download
 
 ADD . /build
 WORKDIR /build
+RUN mkdir -p ./data && go test -v && rm -rf ./data
 RUN go build -ldflags "-linkmode external -s -w -extldflags -static" --trimpath -a -o ./main
 
 FROM scratch
