@@ -7,9 +7,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
+	"strings"
 	"testing"
 	"time"
 )
+
+var testfile = "testfile.bin"
 
 func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
 	file, err := os.Open(path)
@@ -63,13 +67,17 @@ func TestPush(t *testing.T) {
 	extraParams := map[string]string{
 		username: password,
 	}
-	req, err := newfileUploadRequest("/", extraParams, "d", "testfile.bin")
+	req, err := newfileUploadRequest("/", extraParams, "d", testfile)
 	if err != nil {
 		t.Error("error creating request:", err)
 	}
 	router.ServeHTTP(w, req)
 	if w.Code == 200 {
-		t.Logf("%v\n", w.Body.String())
+		body := w.Body.String()
+		wanthash := getSystemHashForFile(testfile)
+		if !strings.Contains(body, wanthash) {
+			t.Errorf("hash not found in response got %v want %v\n", body, wanthash)
+		}
 		return
 	}
 	t.Errorf("Push failed: %d, Body: %v", w.Code, w.Body.String())
@@ -91,7 +99,7 @@ func TestPushWithWrongCreds(t *testing.T) {
 	extraParams := map[string]string{
 		username: "failpw",
 	}
-	req, err := newfileUploadRequest("/", extraParams, "d", "testfile.bin")
+	req, err := newfileUploadRequest("/", extraParams, "d", testfile)
 	if err != nil {
 		t.Error("error creating request:", err)
 	}
@@ -157,4 +165,14 @@ func TestGenerateName(t *testing.T) {
 	if got != want {
 		t.Error("generateName() failed: got", got, "want", want)
 	}
+}
+
+func getSystemHashForFile(filename string) string {
+	cmd := exec.Command("md5sum", filename)
+	res, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	restr := string(res)
+	return restr[:strings.Index(restr, " ")]
 }
