@@ -66,7 +66,6 @@ func authreq() gin.HandlerFunc {
 		if c.PostForm(username) != "" && subtle.ConstantTimeCompare([]byte(c.PostForm(username)), []byte(password)) == 1 {
 			c.Next()
 		} else {
-			fmt.Println("unauthorized")
 			forwardtomain(c)
 			return
 		}
@@ -133,7 +132,6 @@ func main() {
 	if !writable(datadir) {
 		panic("datadir not writable")
 	}
-	fmt.Printf("fuck")
 	r := setupRouter()
 	r.Run(":8080")
 }
