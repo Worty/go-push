@@ -123,6 +123,7 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "--healthcheck" {
 		healthcheck()
 		os.Exit(2)
+		return
 	}
 	err := parseEnv()
 	if err != nil {
