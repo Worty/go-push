@@ -51,6 +51,19 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
 	return r, err
 }
 
+func TestHealth(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/healthcheck", nil)
+	if err != nil {
+		t.Error("error creating request:", err)
+	}
+	router.ServeHTTP(w, req)
+	if w.Code != 200 && w.Body.String() != "OK" {
+		t.Errorf("Health failed: %d, Body: %v", w.Code, w.Body.String())
+	}
+}
+
 func TestPush(t *testing.T) {
 	username := "test"
 	password := "test"

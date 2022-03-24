@@ -17,4 +17,5 @@ WORKDIR /app/
 COPY --from=go-build /build/main /app/
 ENV GIN_MODE=release
 EXPOSE 8080
+HEALTHCHECK --interval=60s --timeout=15s --start-period=5s --retries=3 CMD [ "/app/main", "--healthcheck" ]
 CMD ["./main"]

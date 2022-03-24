@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/sys/unix"
 )
 
 var username string
@@ -109,19 +108,22 @@ func generateMD5(in *multipart.FileHeader) (string, error) {
 
 func setupRouter() *gin.Engine {
 	r := gin.New()
-	r.Use(gin.Logger())
+	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/healthcheck"}}))
 	r.Use(gin.Recovery())
-	r.Use(authreq())
-	r.POST("/", saveupload)
+	auth := r.Group("/", authreq())
+	auth.POST("/", saveupload)
+	r.GET("/healthcheck", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
 	r.NoRoute(forwardtomain)
 	return r
 }
 
-func writable(path string) bool {
-	return unix.Access(path, unix.W_OK) == nil
-}
-
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "--healthcheck" {
+		healthcheck()
+		os.Exit(2)
+	}
 	err := parseEnv()
 	if err != nil {
 		panic(err)

@@ -1,6 +1,6 @@
 services:
   push:
-    image: ghcr.io/worty/go-push:latest
+    image: ghcr.io/worty/go-push:master
     build:
       context: .
     tmpfs:
