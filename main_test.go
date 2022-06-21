@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -14,6 +15,16 @@ import (
 )
 
 var testfile = "testfile.bin"
+
+func TestFolderCreation(t *testing.T) {
+	path := "./data"
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(path, os.ModePerm)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+}
 
 func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
 	file, err := os.Open(path)
