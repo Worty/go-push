@@ -1,8 +1,10 @@
 name: Build backend container
 on:
   push:
-    branches:
-      - "master"
+    # Pattern matched against refs/tags
+    tags:        
+      - '**' # Push events to every tag including hierarchical tags like v1.0/beta
+
 
 jobs:
   docker:
@@ -22,10 +24,10 @@ jobs:
           key: ${{ runner.os }}-buildx-backend-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-backend
-      - name: Extract branch name
+      - name: Extract tag name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+        run: echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/*/})"
+        id: extract_tag
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -39,7 +41,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/worty/go-push:${{ steps.extract_branch.outputs.branch }}
+          tags: ghcr.io/worty/go-push:${{ steps.extract_tag.outputs.tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
       - # Temp fix
