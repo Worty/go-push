@@ -40,7 +40,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/worty/go-push:${{ steps.extract_tag.outputs.tag }}
+          tags: ghcr.io/worty/go-push:${{ steps.extract_tag.outputs.tag }} , ghcr.io/worty/go-push:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
       - # Temp fix
