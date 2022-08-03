@@ -57,7 +57,7 @@ func extractfileending(filename string) string {
 
 func generateName(hash *string, filename string, now time.Time) string {
 	timedatednow := now.Format("02-01-2006_15:04:05")
-	return (timedatednow + "_" + *hash + extractfileending(filename))
+	return timedatednow + "_" + *hash + extractfileending(filename)
 }
 
 func authreq() gin.HandlerFunc {

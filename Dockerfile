@@ -1,5 +1,5 @@
 #docker build -t ghcr.io/worty/go-push .
-FROM golang:1.18-alpine as go-build
+FROM golang:1.19-alpine as go-build
 RUN apk add --no-cache gcc libc-dev tzdata git
 ADD ./go.mod /build/go.mod
 ADD ./go.sum /build/go.sum
