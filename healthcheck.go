@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 )
@@ -14,7 +14,7 @@ func healthcheck() {
 		fmt.Println("Status Code")
 		code = 1
 	} else {
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err == nil {
 			if string(body) != "OK" {
 				fmt.Printf("Body: %v\n", string(body))
