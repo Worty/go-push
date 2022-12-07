@@ -55,9 +55,9 @@ func extractfileending(filename string) string {
 	return ext
 }
 
-func generateName(hash *string, filename string, now time.Time) string {
+func generateName(hash string, filename string, now time.Time) string {
 	timedatednow := now.Format("02-01-2006_15:04:05")
-	return timedatednow + "_" + *hash + extractfileending(filename)
+	return fmt.Sprintf("%s_%s%s", timedatednow, hash, extractfileending(filename))
 }
 
 func authreq() gin.HandlerFunc {
@@ -87,7 +87,7 @@ func saveupload(c *gin.Context) {
 		forwardtomain(c)
 		return
 	}
-	filename := generateName(&hashstring, file.Filename, time.Now())
+	filename := generateName(hashstring, file.Filename, time.Now())
 	err = c.SaveUploadedFile(file, datadir+"/"+filename)
 	if err != nil {
 		fmt.Println(err.Error())

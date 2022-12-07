@@ -192,7 +192,7 @@ func TestGenerateName(t *testing.T) {
 	filename := "test.txt"
 	now, _ := time.Parse("02-01-2006_15:04:05", "02-01-2020_14:31:05")
 	want := "02-01-2020_14:31:05_dfde499e6b44b8757c4b58c3c3768236.txt"
-	got := generateName(&hash, filename, now)
+	got := generateName(hash, filename, now)
 	if got != want {
 		t.Error("generateName() failed: got", got, "want", want)
 	}
