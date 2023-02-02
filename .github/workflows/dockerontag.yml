@@ -39,7 +39,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/worty/go-push:${{ env.GIT_TAG }}3, ghcr.io/worty/go-push:latest
+          tags: ghcr.io/worty/go-push:${{ env.GIT_TAG }}, ghcr.io/worty/go-push:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
       - # Temp fix
