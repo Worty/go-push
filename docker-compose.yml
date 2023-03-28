@@ -9,8 +9,8 @@ services:
       - TZ=Europe/Berlin
       - PUSHUSER=user
       - PUSHPW=password
-      - HOST=https://push.worty.de
-      - FORWARDSITE=https://worty.de
+      - HOST=https://push.example.com
+      - FORWARDSITE=https://example.com
       - DATADIR=/data
     #cpus: 0.5
     mem_limit: 1G
