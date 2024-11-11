@@ -31,9 +31,11 @@ func parseEnv() error {
 	password = os.Getenv("PUSHPW")
 	forwardsite = os.Getenv("FORWARDSITE")
 	host = os.Getenv("HOST")
+
 	if username == "" || password == "" || forwardsite == "" {
 		return errors.New("missing environment variables")
 	}
+
 	datadir = os.Getenv("DATADIR")
 	if datadir == "" {
 		datadir = "./data"
@@ -62,12 +64,12 @@ func generateName(hash string, filename string, now time.Time) string {
 
 func authreq() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.PostForm(username) != "" && subtle.ConstantTimeCompare([]byte(c.PostForm(username)), []byte(password)) == 1 {
+		inputpassword := c.PostForm(username)
+		if inputpassword != "" && subtle.ConstantTimeCompare([]byte(inputpassword), []byte(password)) == 1 {
 			c.Next()
-		} else {
-			forwardtomain(c)
 			return
 		}
+		forwardtomain(c)
 	}
 }
 
@@ -75,21 +77,23 @@ func saveupload(c *gin.Context) {
 	if err := c.Request.ParseMultipartForm(1024 * 1024 * 1024); err != nil { // 1GB
 		forwardtomain(c)
 	}
+
 	file, err := c.FormFile("d")
 	if err != nil || file == nil || file.Filename == "" {
 		fmt.Println("no file")
 		forwardtomain(c)
 		return
 	}
+
 	hashstring, err := generateMD5(file)
 	if err != nil {
 		fmt.Println(err.Error())
 		forwardtomain(c)
 		return
 	}
+
 	filename := generateName(hashstring, file.Filename, time.Now())
-	err = c.SaveUploadedFile(file, datadir+"/"+filename)
-	if err != nil {
+	if err := c.SaveUploadedFile(file, datadir+"/"+filename); err != nil {
 		fmt.Println(err.Error())
 		forwardtomain(c)
 		return
@@ -112,31 +116,39 @@ func setupRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/healthcheck"}}))
 	r.Use(gin.Recovery())
+
 	auth := r.Group("/", authreq())
 	auth.POST("/", saveupload)
+
 	r.GET("/healthcheck", func(c *gin.Context) {
 		c.String(200, "OK")
 	})
+
 	r.NoRoute(forwardtomain)
 	return r
 }
 
 func main() {
 	if len(os.Args) > 1 && os.Args[1] == "--healthcheck" {
-		healthcheck()
-		os.Exit(2)
+		if err := healthcheck(); err != nil {
+			fmt.Println(err.Error())
+			os.Exit(2)
+		}
 		return
 	}
-	err := parseEnv()
-	if err != nil {
+
+	if err := parseEnv(); err != nil {
 		panic(err)
 	}
+
 	if _, err := os.Stat(datadir); os.IsNotExist(err) {
 		panic(err)
 	}
+
 	if !writable(datadir) {
 		panic("datadir not writable")
 	}
+
 	r := setupRouter()
 	r.Run(":8080")
 }
