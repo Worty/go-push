@@ -93,7 +93,7 @@ func saveupload(c *gin.Context) {
 	}
 
 	filename := generateName(hashstring, file.Filename, time.Now())
-	if err := c.SaveUploadedFile(file, datadir+"/"+filename); err != nil {
+	if err := c.SaveUploadedFile(file, filepath.Join(datadir, filename), 0o777); err != nil {
 		fmt.Println(err.Error())
 		forwardtomain(c)
 		return
@@ -149,6 +149,7 @@ func main() {
 		panic("datadir not writable")
 	}
 
-	r := setupRouter()
-	r.Run(":8080")
+	if err := setupRouter().Run(":8080"); err != nil {
+		panic(err)
+	}
 }
